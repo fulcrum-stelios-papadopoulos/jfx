@@ -115,5 +115,7 @@ public enum StageStyle {
      *
      * @since 24
      */
-    EXTENDED
+    EXTENDED,
+
+    EXTENDED_UTILITY
 }

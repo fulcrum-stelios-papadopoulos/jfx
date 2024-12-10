@@ -1271,7 +1271,7 @@ void GlassWindow::ShowSystemMenu(int x, int y)
     menuItemInfo.fState = maximized ? MF_DISABLED : MF_ENABLED;
     SetMenuItemInfo(systemMenu, SC_SIZE, FALSE, &menuItemInfo);
 
-    menuItemInfo.fState = MF_ENABLED;
+    menuItemInfo.fState = style & WS_EX_TOOLWINDOW ? MF_DISABLED : MF_ENABLED;
     SetMenuItemInfo(systemMenu, SC_MINIMIZE, FALSE, &menuItemInfo);
 
     menuItemInfo.fState = maximized ? MF_DISABLED : MF_ENABLED;

@@ -52,7 +52,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -76,7 +76,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -101,7 +101,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: left; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -125,7 +125,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: left; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -152,7 +152,7 @@ public class WindowControlsOverlayTest {
                 .minimize-button { -fx-button-order: 5; }
                 .maximize-button { -fx-button-order: 1; }
                 .close-button { -fx-button-order: 3; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -178,7 +178,7 @@ public class WindowControlsOverlayTest {
                 .minimize-button { -fx-button-order: 5; }
                 .maximize-button { -fx-button-order: 1; }
                 .close-button { -fx-button-order: 3; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -203,7 +203,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; -fx-allow-rtl: false; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         var children = overlay.getChildrenUnmodifiable();
@@ -224,7 +224,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var scene = new Scene(overlay);
         var stage = new Stage();
@@ -250,7 +250,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var scene = new Scene(overlay);
         var stage = new Stage();
@@ -274,7 +274,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var scene = new Scene(overlay);
         var stage = new Stage();
@@ -297,7 +297,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var scene = new Scene(overlay);
 
@@ -316,7 +316,7 @@ public class WindowControlsOverlayTest {
         var overlay = new WindowControlsOverlay(getStylesheet("""
                 .window-button-container { -fx-button-placement: right; }
                 .window-button { -fx-pref-width: 20; -fx-pref-height: 10; }
-            """));
+            """), false);
 
         var unused = new Scene(overlay);
         overlay.resize(200, 100);
