@@ -28,10 +28,10 @@ package com.sun.glass.ui;
 import com.sun.glass.events.MouseEvent;
 import com.sun.javafx.util.Utils;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.css.CssMetaData;
 import javafx.css.PseudoClass;
@@ -48,6 +48,7 @@ import javafx.event.Event;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -207,8 +208,7 @@ public class HeaderButtonOverlay extends Region {
     /**
      * The metrics (placement and size) of header buttons.
      */
-    private final ObjectProperty<HeaderButtonMetrics> metrics = new SimpleObjectProperty<>(
-        this, "metrics", new HeaderButtonMetrics(new Dimension2D(0, 0), new Dimension2D(0, 0), 0));
+    private final MetricsProperty metrics = new MetricsProperty();
 
     /**
      * Specifies the preferred height of header buttons.
@@ -267,15 +267,12 @@ public class HeaderButtonOverlay extends Region {
     private final Subscription subscriptions;
     private final boolean modalOrOwned;
     private final boolean utility;
-    private final boolean rightToLeft;
 
     private Node buttonAtMouseDown;
 
-    public HeaderButtonOverlay(ObservableValue<String> stylesheet, boolean modalOrOwned,
-                               boolean utility, boolean rightToLeft) {
+    public HeaderButtonOverlay(ObservableValue<String> stylesheet, boolean modalOrOwned, boolean utility) {
         this.modalOrOwned = modalOrOwned;
         this.utility = utility;
-        this.rightToLeft = rightToLeft;
 
         var stage = sceneProperty()
             .flatMap(Scene::windowProperty)
@@ -349,6 +346,10 @@ public class HeaderButtonOverlay extends Region {
      * @return the {@code ButtonType} or {@code null}
      */
     public HeaderButtonType buttonAt(double x, double y) {
+        if (getEffectiveNodeOrientation() == NodeOrientation.RIGHT_TO_LEFT) {
+            x = getWidth() - x;
+        }
+
         if (!utility) {
             for (var button : orderedButtons) {
                 if (button.isVisible() && button.getBoundsInParent().contains(x, y)) {
@@ -506,20 +507,10 @@ public class HeaderButtonOverlay extends Region {
 
     @Override
     protected void layoutChildren() {
-        boolean left;
-        Region button1, button2, button3;
-
-        if (rightToLeft) {
-            button1 = orderedButtons.get(2);
-            button2 = orderedButtons.get(1);
-            button3 = orderedButtons.get(0);
-            left = buttonPlacement.get() != ButtonPlacement.LEFT;
-        } else {
-            button1 = orderedButtons.get(0);
-            button2 = orderedButtons.get(1);
-            button3 = orderedButtons.get(2);
-            left = buttonPlacement.get() == ButtonPlacement.LEFT;
-        }
+        boolean left = buttonPlacement.get() == ButtonPlacement.LEFT;
+        Region button1 = orderedButtons.get(0);
+        Region button2 = orderedButtons.get(1);
+        Region button3 = orderedButtons.get(2);
 
         double buttonHeight = switch (buttonVerticalAlignment.get()) {
             case STRETCH -> getEffectiveButtonHeight();
@@ -566,17 +557,7 @@ public class HeaderButtonOverlay extends Region {
             totalHeight = snapSizeY(Math.max(button1Height, Math.max(button2Height, button3Height)));
         }
 
-        Dimension2D currentSize = left ? metrics.get().leftInset() : metrics.get().rightInset();
-
-        // Update the overlay metrics if they have changed.
-        if (currentSize.getWidth() != totalWidth || currentSize.getHeight() != totalHeight) {
-            var empty = new Dimension2D(0, 0);
-            var size = new Dimension2D(totalWidth, totalHeight);
-            HeaderButtonMetrics newMetrics = left
-                ? new HeaderButtonMetrics(size, empty, buttonDefaultHeight.get())
-                : new HeaderButtonMetrics(empty, size, buttonDefaultHeight.get());
-            metrics.set(newMetrics);
-        }
+        metrics.update(totalWidth, totalHeight, left);
 
         layoutInArea(button1, button1X, getButtonOffsetY(button1Height), button1Width, button1Height,
                      BASELINE_OFFSET_SAME_AS_HEIGHT, Insets.EMPTY, true, true,
@@ -589,11 +570,6 @@ public class HeaderButtonOverlay extends Region {
         layoutInArea(button3, button3X, getButtonOffsetY(button3Height), button3Width, button3Height,
                      BASELINE_OFFSET_SAME_AS_HEIGHT, Insets.EMPTY, true, true,
                      HPos.LEFT, VPos.TOP, false);
-    }
-
-    @Override
-    public boolean usesMirroring() {
-        return false;
     }
 
     @Override
@@ -613,7 +589,42 @@ public class HeaderButtonOverlay extends Region {
         return Math.min(Math.max(pref, min), Math.max(min, max));
     }
 
-    private class ButtonRegion extends Region {
+    private final class MetricsProperty
+            extends SimpleObjectProperty<HeaderButtonMetrics>
+            implements ChangeListener<NodeOrientation> {
+
+        MetricsProperty() {
+            super(HeaderButtonOverlay.this, "metrics",
+                  new HeaderButtonMetrics(new Dimension2D(0, 0), new Dimension2D(0, 0), 0));
+
+            effectiveNodeOrientationProperty().addListener(this);
+        }
+
+        public void update(double width, double height, boolean left) {
+            boolean physicalLeft = left == (getEffectiveNodeOrientation() == NodeOrientation.LEFT_TO_RIGHT);
+            Dimension2D current = physicalLeft ? get().leftInset() : get().rightInset();
+
+            if (current.getWidth() != width || current.getHeight() != height) {
+                var empty = new Dimension2D(0, 0);
+                var size = new Dimension2D(width, height);
+
+                HeaderButtonMetrics newMetrics = physicalLeft
+                        ? new HeaderButtonMetrics(size, empty, buttonDefaultHeight.get())
+                        : new HeaderButtonMetrics(empty, size, buttonDefaultHeight.get());
+
+                set(newMetrics);
+            }
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends NodeOrientation> observable,
+                            NodeOrientation oldValue, NodeOrientation newValue) {
+            HeaderButtonMetrics current = get();
+            set(new HeaderButtonMetrics(current.rightInset(), current.leftInset(), current.minHeight()));
+        }
+    }
+
+    private final class ButtonRegion extends Region {
 
         private static final CssMetaData<ButtonRegion, Number> BUTTON_ORDER_METADATA =
             new CssMetaData<>("-fx-button-order", StyleConverter.getSizeConverter()) {

@@ -377,10 +377,7 @@ class WinWindow extends Window {
      * Creates a new {@code HeaderButtonOverlay} instance.
      */
     private HeaderButtonOverlay createHeaderButtonOverlay() {
-        var overlay = new WinHeaderButtonOverlay(
-            isModal() || getOwner() != null, isUtilityWindow(),
-            (getStyleMask() & RIGHT_TO_LEFT) != 0);
-
+        var overlay = new WinHeaderButtonOverlay(isModal() || getOwner() != null, isUtilityWindow());
         overlay.prefButtonHeightProperty().bind(prefHeaderButtonHeightProperty());
         return overlay;
     }

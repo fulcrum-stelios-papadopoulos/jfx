@@ -246,8 +246,7 @@ class GtkWindow extends Window {
     private HeaderButtonOverlay createHeaderButtonOverlay() {
         var overlay = new HeaderButtonOverlay(
             PlatformThemeObserver.getInstance().stylesheetProperty(),
-            isModal() || getOwner() != null, isUtilityWindow(),
-            (getStyleMask() & RIGHT_TO_LEFT) != 0);
+            isModal() || getOwner() != null, isUtilityWindow());
 
         // Set the system-defined absolute minimum size to the size of the window buttons area,
         // regardless of whether the application has specified a smaller minimum size.
